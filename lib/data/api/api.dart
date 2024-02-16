@@ -22,7 +22,7 @@ class Api {
       "Veuillez vérifier votre connexion internet. Un problème de réseau est survenue.";
 //http://192.168.1.162:8000 pour le bureau
 //http://192.168.1.11:8000 pour la maison
-  static const baseUrl = "http://192.168.1.11:8000";
+  static const baseUrl = "http://192.168.1.162:8000";
   static String loginUrl() => "$baseUrl/users/v1/login_patients/";
   static String centreSanteUrl(String idVille) =>
       "$baseUrl/accueils/v1/centresantes/get_centresante_by_ville/$idVille/";
@@ -56,7 +56,8 @@ class Api {
       "$baseUrl/patients/v1/prestation/prestation/$idService/";
   static String fichePaiementUrl() =>
       "$baseUrl/patients/v1/fichepaiements/creationfichepaiements/";
-  static String getFichePaiement() => "$baseUrl/accueils/v1/fichepaiements/";
+  static String getFichePaiementUrl(String idPatient) =>
+      "$baseUrl/patients/v1/getfichePaiement/getfichePaiement/$idPatient/";
 
   // 1er type de POST sans utiliser de token
   Future<ResponseRequest> postApiUn(String url, Map data) async {
@@ -99,9 +100,9 @@ class Api {
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.sendTimeout ||
           e.error is SocketException) {
-        return ResponseRequest(status: 300, message: messageErreurInterne);
-      } else {
         return ResponseRequest(status: 300, message: messageInternet);
+      } else {
+        return ResponseRequest(status: 300, message: messageErreurInterne);
       }
     } catch (e) {
       return ResponseRequest(status: 300, message: messageErreurInterne);
@@ -130,7 +131,7 @@ class Api {
             }),
       );
       print("response.data ${response.data}");
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return ResponseRequest(
           status: 200,
           data: response.data,
@@ -148,19 +149,21 @@ class Api {
         }
       }
     } on DioException catch (e) {
-      if (e.type == DioErrorType.connectionTimeout ||
-          e.type == DioErrorType.receiveTimeout ||
-          e.type == DioErrorType.sendTimeout ||
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout ||
           e.error is SocketException) {
-        return ResponseRequest(status: 300, message: messageErreurInterne);
-      } else {
         return ResponseRequest(status: 300, message: messageInternet);
+      } else {
+        return ResponseRequest(status: 300, message: messageErreurInterne);
       }
     } catch (e) {
       print(e);
       return ResponseRequest(status: 300, message: messageErreurInterne);
     }
   }
+
+  //post avec token mais avec status de réussite 201
 
 // requete get avec token
   Future getApi(String url) async {

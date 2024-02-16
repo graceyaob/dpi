@@ -217,7 +217,7 @@ class _ConsultationPageState extends State<ConsultationPage> {
                 width: double.infinity,
                 title: "Enregistrer",
                 disable: false,
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     Map body = {
                       "fiches": {
@@ -238,7 +238,7 @@ class _ConsultationPageState extends State<ConsultationPage> {
                         "prescripteur": null,
                         "prestations": [
                           {
-                            "montant_a_payer": 0,
+                            "montant_a_payer": idMontant,
                             "montant_assure": 0,
                             "montant_gratuite": 2000,
                             "motif": idPrestation,
@@ -255,36 +255,78 @@ class _ConsultationPageState extends State<ConsultationPage> {
                         "valeur_motif": null
                       }
                     };
-                    Api().postApiDeux(Api.fichePaiementUrl(), body);
+                    sortir =
+                        await Api().postApiDeux(Api.fichePaiementUrl(), body);
 
-                    // print(body);
-                  }
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext) {
-                        return AlertDialog(
-                          content:
-                              Text("Voulez-vous faire le paiement en ligne ?"),
-                          actions: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context)
-                                          .pushNamed("paiement");
-                                    },
-                                    child: Text("Oui")),
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pushNamed("recu");
-                                    },
-                                    child: Text("Non"))
+                    if (sortir.status == 200) {
+                      Map<String, dynamic>? data = sortir.data;
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext) {
+                            return AlertDialog(
+                              content: Column(
+                                children: [
+                                  Text("Opération: Succès"),
+                                  Text(
+                                      "Reçu N°${data?["fichepaiement"]["reference"]}"),
+                                  Text(
+                                      "consultation en ${data?["fichepaiement"]["service"]["libelle"]}"),
+                                ],
+                              ),
+                              actions: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text("Modifier")),
+                                    TextButton(
+                                        onPressed: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (BuildContext) {
+                                                return AlertDialog(
+                                                  content: Text(
+                                                      "Voulez-vous faire le paiement en ligne ?"),
+                                                  actions: [
+                                                    Row(
+                                                      children: [
+                                                        TextButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pushNamed(
+                                                                      "paiement");
+                                                            },
+                                                            child: Text("Oui")),
+                                                        TextButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pushNamed(
+                                                                      "recu");
+                                                            },
+                                                            child: Text("Non"))
+                                                      ],
+                                                    )
+                                                  ],
+                                                );
+                                              });
+                                        },
+                                        child: Text("Suivant")),
+                                  ],
+                                )
                               ],
-                            )
-                          ],
-                        );
-                      });
+                            );
+                          });
+                    } else {
+                      // ignore: use_build_context_synchronously
+                      showAlertDialog(context, sortir.message!);
+                    }
+                  }
                 })
           ],
         ),

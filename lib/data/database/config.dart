@@ -76,30 +76,31 @@ class Database {
   }
 
   int calculateTimeDifference(String timerString) {
-    // Vérifier si la chaîne de caractères est vide
-    if (timerString.isEmpty) {
-      // Si la chaîne est vide, renvoyer une différence de temps de 0
+    // Vérifier si la chaîne de date est vide ou null
+    if (timerString == null || timerString.isEmpty) {
+      // Gérer le cas où la chaîne de date est invalide
+      print("Chaîne de date invalide.");
       return 0;
     }
-
-    // Ajouter un zéro devant le mois et le jour si nécessaire
-    List<String> parts = timerString.split(' ');
-    List<String> dateParts = parts[0].split('-');
-    if (dateParts[1].length == 1) {
-      dateParts[1] = '0' + dateParts[1];
-    }
-    if (dateParts[2].length == 1) {
-      dateParts[2] = '0' + dateParts[2];
-    }
-    String formattedDateString = dateParts.join('-') + ' ' + parts[1];
 
     // Convertir la chaîne de caractères en objet DateTime
     DateTime timer;
     try {
-      timer = DateTime.parse(formattedDateString);
+      // Séparer la chaîne en date et heure
+      List<String> dateTimeParts = timerString.split(' ');
+      List<String> dateParts = dateTimeParts[0].split('-');
+      List<String> timeParts = dateTimeParts[1].split(':');
+
+      int year = int.parse(dateParts[0]);
+      int month = int.parse(dateParts[1]);
+      int day = int.parse(dateParts[2]);
+      int hour = int.parse(timeParts[0]);
+      int minute = int.parse(timeParts[1]);
+      int second = int.parse(timeParts[2]);
+
+      timer = DateTime(year, month, day, hour, minute, second);
     } catch (e) {
-      // Gérer les erreurs de format de date ici
-      print("Erreur de format de date : $e");
+      print("Erreur lors de la conversion de la date : $e");
       return 0;
     }
 

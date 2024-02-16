@@ -208,10 +208,6 @@ class _LoginState extends State<Login> {
                                           databdlocal.username) &&
                                       (_passwordController.text ==
                                           databdlocal.password)) {
-                                    setState(() {
-                                      isLoading = false;
-                                    });
-
                                     //verification de la validité du token
                                     int timeDifference = Database()
                                         .calculateTimeDifference(
