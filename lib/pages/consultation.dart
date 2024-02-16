@@ -29,6 +29,7 @@ class _ConsultationPageState extends State<ConsultationPage> {
   String idPrestation = "";
   String idPatient = "";
   String idCentreSante = "";
+  String idMontant = "";
   ResponseRequest sortir = ResponseRequest(status: 0);
 
   @override
@@ -205,6 +206,7 @@ class _ConsultationPageState extends State<ConsultationPage> {
                   if (prestation["motif"]["libelle"] == selectedPrestation) {
                     setState(() {
                       idPrestation = prestation["id"];
+                      idMontant = prestation["motif"]["cout"];
                     });
                   }
                 });
@@ -225,9 +227,9 @@ class _ConsultationPageState extends State<ConsultationPage> {
                         "centre_demande": null,
                         "centresante": idCentreSante,
                         "gratuite_cible": true,
-                        "montant_a_payer": 0,
+                        "montant_a_payer": idMontant,
                         "montant_assure": 0,
-                        "montant_gratuite": 2000,
+                        "montant_gratuite": 0,
                         "montant_total": 0,
                         "motif": null,
                         "motif_examens": [idPrestation],
@@ -257,7 +259,32 @@ class _ConsultationPageState extends State<ConsultationPage> {
 
                     // print(body);
                   }
-                  Navigator.of(context).pushNamed("paiement");
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext) {
+                        return AlertDialog(
+                          content:
+                              Text("Voulez-vous faire le paiement en ligne ?"),
+                          actions: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pushNamed("paiement");
+                                    },
+                                    child: Text("Oui")),
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pushNamed("recu");
+                                    },
+                                    child: Text("Non"))
+                              ],
+                            )
+                          ],
+                        );
+                      });
                 })
           ],
         ),

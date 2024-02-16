@@ -9,6 +9,7 @@ import 'package:dpi_mobile/utils/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class Login extends StatefulWidget {
   Login({super.key, required this.visibility});
@@ -212,10 +213,10 @@ class _LoginState extends State<Login> {
                                     });
 
                                     //verification de la validité du token
-
-                                    if (Database().calculateTimeDifference(
-                                            databdlocal.timer) <
-                                        20) {
+                                    int timeDifference = Database()
+                                        .calculateTimeDifference(
+                                            databdlocal.timer);
+                                    if (timeDifference < 20) {
                                       Navigator.of(context)
                                           .pushReplacementNamed("main");
                                     }

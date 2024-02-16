@@ -56,6 +56,7 @@ class Api {
       "$baseUrl/patients/v1/prestation/prestation/$idService/";
   static String fichePaiementUrl() =>
       "$baseUrl/patients/v1/fichepaiements/creationfichepaiements/";
+  static String getFichePaiement() => "$baseUrl/accueils/v1/fichepaiements/";
 
   // 1er type de POST sans utiliser de token
   Future<ResponseRequest> postApiUn(String url, Map data) async {

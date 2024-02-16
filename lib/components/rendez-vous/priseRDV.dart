@@ -85,7 +85,9 @@ class _PriseRdvState extends State<PriseRdv> {
               couleurEcriture: Colors.white,
               fondBouton: Colors.blue,
               title: "                  Valider                     ",
-              onPressed: () {})
+              onPressed: () {
+                Navigator.of(context).pushNamed("rdv");
+              })
         ],
       ),
     );

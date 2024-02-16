@@ -76,16 +76,32 @@ class Database {
   }
 
   int calculateTimeDifference(String timerString) {
-    // Ajouter un 0 devant le mois si nécessaire
+    // Vérifier si la chaîne de caractères est vide
+    if (timerString.isEmpty) {
+      // Si la chaîne est vide, renvoyer une différence de temps de 0
+      return 0;
+    }
+
+    // Ajouter un zéro devant le mois et le jour si nécessaire
     List<String> parts = timerString.split(' ');
     List<String> dateParts = parts[0].split('-');
     if (dateParts[1].length == 1) {
       dateParts[1] = '0' + dateParts[1];
     }
+    if (dateParts[2].length == 1) {
+      dateParts[2] = '0' + dateParts[2];
+    }
     String formattedDateString = dateParts.join('-') + ' ' + parts[1];
 
     // Convertir la chaîne de caractères en objet DateTime
-    DateTime timer = DateTime.parse(formattedDateString);
+    DateTime timer;
+    try {
+      timer = DateTime.parse(formattedDateString);
+    } catch (e) {
+      // Gérer les erreurs de format de date ici
+      print("Erreur de format de date : $e");
+      return 0;
+    }
 
     // Obtenir la date et l'heure actuelles
     DateTime now = DateTime.now();

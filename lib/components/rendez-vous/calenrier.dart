@@ -5,7 +5,7 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:intl/intl.dart';
 
 class Calendrier extends StatefulWidget {
-  const Calendrier({super.key});
+  const Calendrier({Key? key});
 
   @override
   State<Calendrier> createState() => _CalendrierState();
@@ -34,6 +34,33 @@ class _CalendrierState extends State<Calendrier> {
         view: CalendarView.week,
         firstDayOfWeek: 1,
         dataSource: AppointSource(_appointments),
+        // fonction pour afficher un boite a dialogue pour rendre les details des rendez vous visible
+        onTap: (CalendarTapDetails details) {
+          if (details.appointments != null &&
+              details.appointments!.isNotEmpty) {
+            // Afficher une boîte de dialogue lorsque l'utilisateur clique sur un rendez-vous
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                // Créer et retourner la boîte de dialogue
+                return AlertDialog(
+                  title: Text("Rendez-vous"),
+                  content:
+                      Text("Description: ${details.appointments![0].subject}"),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context)
+                            .pop(); // Fermer la boîte de dialogue
+                      },
+                      child: Text('Fermer'),
+                    ),
+                  ],
+                );
+              },
+            );
+          }
+        },
       ),
     );
   }
