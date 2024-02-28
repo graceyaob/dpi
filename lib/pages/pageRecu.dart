@@ -13,6 +13,7 @@ class RecuPaiement extends StatefulWidget {
 class _RecuPaiementState extends State<RecuPaiement> {
   String id = '';
   List consultations = [];
+  bool uneConsultation = true;
 
   @override
   void initState() {
@@ -26,7 +27,11 @@ class _RecuPaiementState extends State<RecuPaiement> {
 
       Api().getApi(Api.consultationUrl(id)).then((value) {
         setState(() {
-          consultations = value;
+          if (value == 404) {
+            uneConsultation = false;
+          } else {
+            consultations = value;
+          }
         });
       });
     });
@@ -92,25 +97,30 @@ class _RecuPaiementState extends State<RecuPaiement> {
     return Scaffold(
         appBar: AppBar(),
         body: SafeArea(
-          child: Column(children: [
-            Text("Liste des fiches et reçus de paiement"),
-            Config.spaceSmall,
-            SizedBox(
-                height: Config.heightSize * 0.45,
-                //Arevoir
-                child: FutureBuilder<List<Card>>(
-                    future: buildConsultationCards(consultations),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<List<Card>> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text("Erreur: ${snapshot.error}");
-                      } else {
-                        return ListView(children: snapshot.data!);
-                      }
-                    }))
-          ]),
+          child: SingleChildScrollView(
+            child: Column(children: [
+              Text("Liste des fiches et reçus de paiement"),
+              Config.spaceSmall,
+              SizedBox(
+                  height: Config.heightSize * 0.45,
+                  //Arevoir
+                  child: uneConsultation
+                      ? FutureBuilder<List<Card>>(
+                          future: buildConsultationCards(consultations),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<List<Card>> snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text("Erreur: ${snapshot.error}");
+                            } else {
+                              return ListView(children: snapshot.data!);
+                            }
+                          })
+                      : Text("vous n'avez pas de consultation"))
+            ]),
+          ),
         ));
   }
 }

@@ -10,6 +10,7 @@ import 'package:dpi_mobile/pages/login.dart';
 import 'package:dpi_mobile/pages/modifInfo.dart';
 import 'package:dpi_mobile/pages/pageRecu.dart';
 import 'package:dpi_mobile/pages/paiementEnligne.dart';
+import 'package:dpi_mobile/pages/plusrendezvous.dart';
 import 'package:dpi_mobile/pages/rendezVous.dart';
 import 'package:dpi_mobile/utils/config.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +73,8 @@ class MyApp extends StatelessWidget {
         "baseCarnet": (context) => const ContainerCarnet(),
         "paiement": (context) => const Paiement(),
         "recu": (context) => const RecuPaiement(),
-        "detailRecu": (context) => const DetailRecu()
+        "detailRecu": (context) => const DetailRecu(),
+        "punrdv": (context) => const AppointplusPage()
       },
     );
   }

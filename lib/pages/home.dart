@@ -1,4 +1,5 @@
 import 'package:dpi_mobile/components/buttonFacture.dart';
+import 'package:dpi_mobile/components/function404.dart';
 import 'package:dpi_mobile/components/home/containerImage.dart';
 import 'package:dpi_mobile/components/home/welcome.dart';
 import 'package:dpi_mobile/data/api/api.dart';
@@ -14,6 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool uneConsultation = true;
   String id = '';
   List consultations = [];
   Map constantes = {};
@@ -31,20 +33,26 @@ class _HomePageState extends State<HomePage> {
       Api().getApi(Api.consultationUrl(id)).then((value) {
         if (mounted) {
           setState(() {
-            consultations = value;
-            Map consultation = consultations[consultations.length - 1];
+            if (value == 404) {
+              uneConsultation = false;
+            } else {
+              consultations = value;
+              Map consultation = consultations[consultations.length - 1];
 
-            String fichePaiement = consultation['fichepaiement'];
-            print(fichePaiement);
-            Api().getApi(Api.constanteAcceuilUrl(fichePaiement)).then((value) {
-              if (mounted) {
-                setState(() {
-                  constantes = value[0];
-                });
+              String fichePaiement = consultation['fichepaiement'];
+              print(fichePaiement);
+              Api()
+                  .getApi(Api.constanteAcceuilUrl(fichePaiement))
+                  .then((value) {
+                if (mounted) {
+                  setState(() {
+                    constantes = value[0];
+                  });
 
-                print(constantes);
-              }
-            });
+                  print(constantes);
+                }
+              });
+            }
           });
         }
       });
@@ -70,58 +78,66 @@ class _HomePageState extends State<HomePage> {
               Padding(
                   padding: EdgeInsets.symmetric(
                       horizontal: largeur * 0.05, vertical: largeur * 0.05),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Text(
-                        "Mes dernières constantes",
-                        style: TextStyle(
-                            color: const Color(0xFF655F5F),
-                            fontSize: largeur * 0.04,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      Config.spaceMeduim,
-                      Padding(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: largeur * 0.05),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  ContainerImage(
-                                      image: "assets/images/haltere.png",
-                                      titre: "Mon poids",
-                                      valeur: "${constantes['poids']} kg"),
-                                  ContainerImage(
-                                      image: "assets/images/taille.png",
-                                      titre: "Ma taille",
-                                      valeur: "${constantes['taille']} cm")
-                                ],
-                              ),
-                              Config.spaceMeduim,
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  ContainerImage(
-                                      image: "assets/images/formegros.png",
-                                      titre: "IMC",
-                                      valeur: "${constantes['imc']} kg/m²"),
-                                  ContainerImage(
-                                      image: "assets/images/sucre.png",
-                                      titre: "Diabétique",
-                                      valeur: constantes['glycemie'] == null
-                                          ? "Non"
-                                          : "Oui")
-                                ],
-                              )
-                            ],
-                          ))
-                    ],
-                  )),
+                  child: uneConsultation
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text(
+                              "Mes dernières constantes",
+                              style: TextStyle(
+                                  color: const Color(0xFF655F5F),
+                                  fontSize: largeur * 0.04,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            Config.spaceMeduim,
+                            Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: largeur * 0.05),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        ContainerImage(
+                                            image: "assets/images/haltere.png",
+                                            titre: "Mon poids",
+                                            valeur:
+                                                "${constantes['poids']} kg"),
+                                        ContainerImage(
+                                            image: "assets/images/taille.png",
+                                            titre: "Ma taille",
+                                            valeur:
+                                                "${constantes['taille']} cm")
+                                      ],
+                                    ),
+                                    Config.spaceMeduim,
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        ContainerImage(
+                                            image:
+                                                "assets/images/formegros.png",
+                                            titre: "IMC",
+                                            valeur:
+                                                "${constantes['imc']} kg/m²"),
+                                        ContainerImage(
+                                            image: "assets/images/sucre.png",
+                                            titre: "Diabétique",
+                                            valeur:
+                                                constantes['glycemie'] == null
+                                                    ? "Non"
+                                                    : "Oui")
+                                      ],
+                                    )
+                                  ],
+                                ))
+                          ],
+                        )
+                      : ErrorFunction(
+                          message: "Aucuns parametres enregistrés")),
               Config.spaceSmall,
               Padding(
                 padding: EdgeInsets.only(left: largeur * 0.70),

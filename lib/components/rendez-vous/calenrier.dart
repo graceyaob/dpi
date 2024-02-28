@@ -1,3 +1,4 @@
+import 'package:dpi_mobile/components/function404.dart';
 import 'package:dpi_mobile/data/api/api.dart';
 import 'package:dpi_mobile/data/database/config.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class Calendrier extends StatefulWidget {
 
 class _CalendrierState extends State<Calendrier> {
   late List<Appointment> _appointments = [];
+  bool _isLoading = true; // Variable pour suivre l'état de chargement
 
   @override
   void initState() {
@@ -21,74 +23,89 @@ class _CalendrierState extends State<Calendrier> {
   }
 
   Future<void> _loadAppointments() async {
-    List<Appointment> appointments = await getAppointments();
+    final List<Appointment> appointments = await getAppointments();
     setState(() {
       _appointments = appointments;
+      _isLoading =
+          false; // Mettez à jour l'état de chargement une fois le chargement terminé
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SfCalendar(
-        view: CalendarView.week,
-        firstDayOfWeek: 1,
-        dataSource: AppointSource(_appointments),
-        // fonction pour afficher un boite a dialogue pour rendre les details des rendez vous visible
-        onTap: (CalendarTapDetails details) {
-          if (details.appointments != null &&
-              details.appointments!.isNotEmpty) {
-            // Afficher une boîte de dialogue lorsque l'utilisateur clique sur un rendez-vous
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                // Créer et retourner la boîte de dialogue
-                return AlertDialog(
-                  title: Text("Rendez-vous"),
-                  content:
-                      Text("Description: ${details.appointments![0].subject}"),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pop(); // Fermer la boîte de dialogue
-                      },
-                      child: Text('Fermer'),
-                    ),
-                  ],
-                );
-              },
-            );
-          }
-        },
-      ),
+      body: _isLoading
+          ? Center(
+              child:
+                  CircularProgressIndicator()) // Afficher un indicateur de chargement si les rendez-vous sont en cours de chargement
+          : _appointments.isEmpty
+              ? ErrorFunction(
+                  message:
+                      "Aucun rendez-vous trouvé") // Afficher un message si la liste est vide
+              : SfCalendar(
+                  view: CalendarView.week,
+                  firstDayOfWeek: 1,
+                  dataSource: AppointSource(_appointments),
+                  // fonction pour afficher un boite a dialogue pour rendre les details des rendez vous visible
+                  onTap: (CalendarTapDetails details) {
+                    if (details.appointments != null &&
+                        details.appointments!.isNotEmpty) {
+                      // Afficher une boîte de dialogue lorsque l'utilisateur clique sur un rendez-vous
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          // Créer et retourner la boîte de dialogue
+                          return AlertDialog(
+                            title: Text("Rendez-vous"),
+                            content: Text(
+                                "Description: ${details.appointments![0].subject}"),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  // Fermer la boîte de dialogue
+                                },
+                                child: Text('Fermer'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
     );
   }
 }
 
 Future<List<Appointment>> getAppointments() async {
-  String id = await Database().getInfoBoxPatient().then((value) => value.id);
-  List rendez =
+  final String id =
+      await Database().getInfoBoxPatient().then((value) => value.id);
+  final rendez =
       await Api().getApi(Api.rendezVousUrl(id)).then((value) => value);
 
-  List<Appointment> rdvs = <Appointment>[];
-  for (int index = 0; index < rendez.length; index++) {
-    Map unRdv = rendez[index];
-    DateTime rdv = DateTime.parse('${unRdv["datePrevue"]}');
+  if (rendez == 404) {
+    return []; // Retourner une liste vide si aucun rendez-vous n'est trouvé
+  }
 
-    String heureDebut = unRdv["heureDebut"];
+  final List<Appointment> rdvs = [];
+  for (int index = 0; index < rendez.length; index++) {
+    final Map unRdv = rendez[index];
+    final DateTime rdv = DateTime.parse('${unRdv["datePrevue"]}');
+
+    final String heureDebut = unRdv["heureDebut"];
     DateTime startime = DateFormat('HH:mm:ss').parse(heureDebut);
     startime = DateTime(rdv.year, rdv.month, rdv.day, startime.hour,
         startime.minute, startime.second);
-    String heureFin = unRdv["heureFin"];
+    final String heureFin = unRdv["heureFin"];
     DateTime endtime = DateFormat('HH:mm:ss').parse(heureFin);
     startime = DateTime(rdv.year, rdv.month, rdv.day, startime.hour,
         startime.minute, startime.second);
-    String centre = await Api()
+    final String centre = await Api()
         .getApi(Api.centreSanteByIdUrl(unRdv["centresante"]))
         .then((value) => value["libelle"]);
 
-    var servicerecupere = unRdv["service"];
+    final servicerecupere = unRdv["service"];
     String service = "";
 
     if (servicerecupere == null || service.isEmpty) {

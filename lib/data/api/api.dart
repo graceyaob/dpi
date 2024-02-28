@@ -22,7 +22,7 @@ class Api {
       "Veuillez vérifier votre connexion internet. Un problème de réseau est survenue.";
 //http://192.168.1.162:8000 pour le bureau
 //http://192.168.1.11:8000 pour la maison
-  static const baseUrl = "http://192.168.1.162:8000";
+  static const baseUrl = "https://dpi-backend-develop.winlogic.pro";
   static String loginUrl() => "$baseUrl/users/v1/login_patients/";
   static String centreSanteUrl(String idVille) =>
       "$baseUrl/accueils/v1/centresantes/get_centresante_by_ville/$idVille/";
@@ -137,29 +137,27 @@ class Api {
           data: response.data,
         );
       } else {
-        try {
-          if (response.data["erreur"] == null) {
-            return ResponseRequest(status: 300, message: messageErreur);
-          } else {
-            return ResponseRequest(
-                status: 300, message: response.data["erreur"]);
-          }
-        } catch (e) {
-          return ResponseRequest(status: 300, message: messageErreur);
-        }
+        // Si le statut de la réponse n'est pas 200 ou 201, il y a eu une erreur
+        print("hamilton");
+        // Tentative de récupération du message d'erreur depuis les données de la réponse
+        String errorMessage = response.data['erreur'] ?? 'Erreur inconnue';
+        print("je suis dans ${response.data}");
+
+        // Retour d'un objet ResponseRequest avec un statut de 300 et le message d'erreur
+        return ResponseRequest(status: 300, message: errorMessage);
       }
     } on DioException catch (e) {
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.sendTimeout ||
           e.error is SocketException) {
-        return ResponseRequest(status: 300, message: messageInternet);
+        return ResponseRequest(status: 300, message: "erreur de connexion");
       } else {
-        return ResponseRequest(status: 300, message: messageErreurInterne);
+        return ResponseRequest(status: 300, message: "erreur interne 1");
       }
     } catch (e) {
       print(e);
-      return ResponseRequest(status: 300, message: messageErreurInterne);
+      return ResponseRequest(status: 300, message: "erreur interne 2");
     }
   }
 

@@ -7,14 +7,14 @@ import 'package:dpi_mobile/utils/config.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 
-class ConsultationPage extends StatefulWidget {
-  const ConsultationPage({super.key});
+class AppointplusPage extends StatefulWidget {
+  const AppointplusPage({super.key});
 
   @override
-  State<ConsultationPage> createState() => _ConsultationPageState();
+  State<AppointplusPage> createState() => _AppointplusPageState();
 }
 
-class _ConsultationPageState extends State<ConsultationPage> {
+class _AppointplusPageState extends State<AppointplusPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   List<String> itemsVilles = [""];
@@ -35,32 +35,21 @@ class _ConsultationPageState extends State<ConsultationPage> {
 
   @override
   void initState() {
-    super.initState();
-    loadVilles();
-    loadIdPatient();
-  }
-
-  void loadVilles() {
     Api().getApi(Api.villesUrl()).then((value) {
       setState(() {
         listVille = value;
-        itemsVilles.clear();
-        itemsVilles.add(""); // Ajoutez l'élément vide au début
+
         listVille.forEach((item) {
-          if (!itemsVilles.contains(item["libelle"])) {
-            itemsVilles.add(item["libelle"]);
-          }
+          itemsVilles.add(item["libelle"]);
         });
       });
     });
-  }
-
-  void loadIdPatient() {
     Database().getInfoBoxPatient().then((value) {
       setState(() {
         idPatient = value.id;
       });
     });
+    super.initState();
   }
 
   @override
@@ -118,7 +107,6 @@ class _ConsultationPageState extends State<ConsultationPage> {
       child: Form(
         key: _formKey,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ChampSelect(
               items: itemsVilles,
@@ -132,7 +120,6 @@ class _ConsultationPageState extends State<ConsultationPage> {
                     Api().getApi(Api.centreSanteUrl(ville["id"])).then((value) {
                       setState(() {
                         listCentre = value;
-
                         itemscentres.clear();
                         itemscentres.add("");
                       });
@@ -202,11 +189,8 @@ class _ConsultationPageState extends State<ConsultationPage> {
                         });
                         listPrestations.forEach((prestation) {
                           setState(() {
-                            if (!itemsPrestations
-                                .contains(prestation["motif"]["libelle"])) {
-                              itemsPrestations
-                                  .add(prestation["motif"]["libelle"]);
-                            }
+                            itemsPrestations
+                                .add(prestation["motif"]["libelle"]);
                           });
                         });
                       });
@@ -294,8 +278,15 @@ class _ConsultationPageState extends State<ConsultationPage> {
                           context: context,
                           builder: (BuildContext) {
                             return AlertDialog(
-                              content: Text(
-                                  "N° de la facture:${data?["fichepaiement"]["reference"]} pour la consultation en ${data?["fichepaiement"]["service"]["libelle"]}"),
+                              content: Column(
+                                children: [
+                                  Text("Opération: Succès"),
+                                  Text(
+                                      "Reçu N°${data?["fichepaiement"]["reference"]}"),
+                                  Text(
+                                      "consultation en ${data?["fichepaiement"]["service"]["libelle"]}"),
+                                ],
+                              ),
                               actions: [
                                 Row(
                                   mainAxisAlignment:
@@ -348,7 +339,6 @@ class _ConsultationPageState extends State<ConsultationPage> {
                           });
                     } else {
                       // ignore: use_build_context_synchronously
-
                       showAlertDialog(context, sortir.message!);
                     }
                   }
@@ -359,9 +349,3 @@ class _ConsultationPageState extends State<ConsultationPage> {
     );
   }
 }
-
-//Dans cet exemple, nous avons utilisé Form pour englober le widget de sélection et le bouton de validation. Le widget DropdownButtonFormField est utilisé pour créer le champ de sélection, et ElevatedButton est utilisé pour le bouton de validation. Lorsque l'utilisateur sélectionne une option et appuie sur le bouton "Valider", les données sont validées et traitées.
-
-//Assurez-vous d'ajouter une logique de validation appropriée si nécessaire en utilisant le paramètre validator du widget DropdownButtonFormField.
-
-

@@ -1,3 +1,4 @@
+import 'package:dpi_mobile/components/function404.dart';
 import 'package:dpi_mobile/data/api/api.dart';
 import 'package:dpi_mobile/data/database/config.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ class AppointListeApp extends StatefulWidget {
 class _AppointListeAppState extends State<AppointListeApp> {
   String id = "";
   List rdv = [];
+  bool unrdv = true;
 
   @override
   void initState() {
@@ -20,7 +22,12 @@ class _AppointListeAppState extends State<AppointListeApp> {
         id = value.id;
         Api().getApi(Api.rendezVousUrl(id)).then((value) {
           setState(() {
-            rdv = value;
+            if (value == 404) {
+              unrdv = false;
+            } else {
+              rdv = value;
+            }
+
             print(rdv);
           });
         });
@@ -72,30 +79,32 @@ class _AppointListeAppState extends State<AppointListeApp> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(3),
-        child: FutureBuilder<List<DataRow>>(
-          future: buildrdvRows(rdv),
-          builder:
-              (BuildContext context, AsyncSnapshot<List<DataRow>> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text("Erreur: ${snapshot.error}"));
-            } else {
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: [
-                    DataColumn(label: Text('Date')),
-                    DataColumn(label: Text("service")),
-                    DataColumn(label: Text('Centre')),
-                    DataColumn(label: Text('Heure')),
-                  ],
-                  rows: snapshot.data!,
-                ),
-              );
-            }
-          },
-        ),
+        child: unrdv
+            ? FutureBuilder<List<DataRow>>(
+                future: buildrdvRows(rdv),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<DataRow>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text("Erreur: ${snapshot.error}"));
+                  } else {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        columns: [
+                          DataColumn(label: Text('Date')),
+                          DataColumn(label: Text("service")),
+                          DataColumn(label: Text('Centre')),
+                          DataColumn(label: Text('Heure')),
+                        ],
+                        rows: snapshot.data!,
+                      ),
+                    );
+                  }
+                },
+              )
+            : ErrorFunction(message: "Aucun rendez-vous trouvé"),
       ),
     );
   }

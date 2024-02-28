@@ -171,7 +171,7 @@ class _LoginState extends State<Login> {
                                 print(databdlocal.firstLogin);
 
                                 //si first login == true alors tu appelles l'Api du back(internet)
-                                if (databdlocal.firstLogin == true) {
+                                if (databdlocal.firstLogin == false) {
                                   sortir = await Api()
                                       .postApiUn(Api.loginUrl(), data);
                                   if (sortir.status == 200) {
