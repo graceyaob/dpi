@@ -12,6 +12,15 @@ String access = "";
 String refresh = "";
 int heureConnexionenMinutes = 0;
 
+void getHttp() async {
+  try {
+    var response = await Dio().get('http://dpi-backend-develop.winlogic.pro');
+    print("success");
+  } catch (e) {
+    print(e);
+  }
+}
+
 class Api {
   static String messageErreur =
       "Nous n'avons pu traiter votre demande car une erreur est survenue.";
@@ -22,7 +31,7 @@ class Api {
       "Veuillez vérifier votre connexion internet. Un problème de réseau est survenue.";
 //http://192.168.1.162:8000 pour le bureau
 //http://192.168.1.11:8000 pour la maison
-  static const baseUrl = "https://dpi-backend-develop.winlogic.pro";
+  static const baseUrl = 'http://dpi-backend-develop.winlogic.pro';
   static String loginUrl() => "$baseUrl/users/v1/login_patients/";
   static String centreSanteUrl(String idVille) =>
       "$baseUrl/accueils/v1/centresantes/get_centresante_by_ville/$idVille/";

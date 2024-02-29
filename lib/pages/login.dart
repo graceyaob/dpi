@@ -169,9 +169,10 @@ class _LoginState extends State<Login> {
                                 Patient databdlocal =
                                     await Database().getInfoBoxPatient();
                                 print(databdlocal.firstLogin);
+                                getHttp();
 
                                 //si first login == true alors tu appelles l'Api du back(internet)
-                                if (databdlocal.firstLogin == false) {
+                                if (databdlocal.firstLogin == true) {
                                   sortir = await Api()
                                       .postApiUn(Api.loginUrl(), data);
                                   if (sortir.status == 200) {
