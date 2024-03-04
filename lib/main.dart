@@ -73,7 +73,13 @@ class MyApp extends StatelessWidget {
         "baseCarnet": (context) => const ContainerCarnet(),
         "paiement": (context) => const Paiement(),
         "recu": (context) => const RecuPaiement(),
-        "detailRecu": (context) => const DetailRecu(),
+        'detailRecu': (context) => DetailRecu(
+            payementeffectue: bool.parse(
+                ModalRoute.of(context)?.settings.arguments.toString() ??
+                    'false')),
+        /*"detailRecu": (context) => DetailRecu(
+              payementeffectue: false,
+            ),*/
         "punrdv": (context) => const AppointplusPage()
       },
     );

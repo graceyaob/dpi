@@ -80,7 +80,9 @@ class _CarnetState extends State<Carnet> {
             trailing: TextButton(
               onPressed: () async {
                 Navigator.of(context).pushNamed("baseCarnet");
+                //supprimer ma base de donnée tempoeaire
                 await MySharedPreferences.clearData();
+                // sauvegarder les inforamtion de la fiche de paiement
                 await MySharedPreferences.saveData(
                     consultation["fichepaiement"]);
               },
@@ -115,7 +117,10 @@ class _CarnetState extends State<Carnet> {
                         return ListView(children: snapshot.data!);
                       }
                     })
-                : ErrorFunction(message: "Aucune consultation trouvé"))
+                : ErrorFunction(
+                    message: "Aucune consultation trouvé",
+                    height: Config.heightSize * 0.43,
+                  ))
       ]),
     ));
   }

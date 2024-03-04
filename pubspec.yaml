@@ -59,6 +59,9 @@ dependencies:
   syncfusion_localizations: ^21.2.4
   intl: ^0.17.0
   searchable_paginated_dropdown: ^1.2.0
+  http: ^1.0.0
+
+  connectivity_plus: ^5.0.2
 
 
 dev_dependencies:

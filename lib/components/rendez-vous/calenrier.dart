@@ -1,6 +1,7 @@
 import 'package:dpi_mobile/components/function404.dart';
 import 'package:dpi_mobile/data/api/api.dart';
 import 'package:dpi_mobile/data/database/config.dart';
+import 'package:dpi_mobile/utils/config.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:intl/intl.dart';
@@ -40,8 +41,9 @@ class _CalendrierState extends State<Calendrier> {
                   CircularProgressIndicator()) // Afficher un indicateur de chargement si les rendez-vous sont en cours de chargement
           : _appointments.isEmpty
               ? ErrorFunction(
-                  message:
-                      "Aucun rendez-vous trouvé") // Afficher un message si la liste est vide
+                  message: "Aucun rendez-vous trouvé",
+                  height: Config.heightSize * 0.43,
+                ) // Afficher un message si la liste est vide
               : SfCalendar(
                   view: CalendarView.week,
                   firstDayOfWeek: 1,
@@ -97,7 +99,8 @@ Future<List<Appointment>> getAppointments() async {
     DateTime startime = DateFormat('HH:mm:ss').parse(heureDebut);
     startime = DateTime(rdv.year, rdv.month, rdv.day, startime.hour,
         startime.minute, startime.second);
-    final String heureFin = unRdv["heureFin"];
+    final String heureFin =
+        unRdv["heureFin"] == null ? unRdv["heureDebut"] : unRdv["heureFin"];
     DateTime endtime = DateFormat('HH:mm:ss').parse(heureFin);
     startime = DateTime(rdv.year, rdv.month, rdv.day, startime.hour,
         startime.minute, startime.second);

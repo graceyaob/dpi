@@ -6,20 +6,11 @@ import 'package:dpi_mobile/data/models/models_database.dart';
 import '../database/config.dart';
 import '../models/models_api.dart';
 
-Dio dio = Dio();
+Dio dio = Dio(BaseOptions(connectTimeout: Duration(seconds: 10)));
 Map<String, dynamic> data = Map();
 String access = "";
 String refresh = "";
 int heureConnexionenMinutes = 0;
-
-void getHttp() async {
-  try {
-    var response = await Dio().get('http://dpi-backend-develop.winlogic.pro');
-    print("success");
-  } catch (e) {
-    print(e);
-  }
-}
 
 class Api {
   static String messageErreur =
@@ -31,7 +22,7 @@ class Api {
       "Veuillez vérifier votre connexion internet. Un problème de réseau est survenue.";
 //http://192.168.1.162:8000 pour le bureau
 //http://192.168.1.11:8000 pour la maison
-  static const baseUrl = 'http://dpi-backend-develop.winlogic.pro';
+  static const baseUrl = 'http://192.168.1.145:8000';
   static String loginUrl() => "$baseUrl/users/v1/login_patients/";
   static String centreSanteUrl(String idVille) =>
       "$baseUrl/accueils/v1/centresantes/get_centresante_by_ville/$idVille/";
@@ -65,8 +56,10 @@ class Api {
       "$baseUrl/patients/v1/prestation/prestation/$idService/";
   static String fichePaiementUrl() =>
       "$baseUrl/patients/v1/fichepaiements/creationfichepaiements/";
-  static String getFichePaiementUrl(String idPatient) =>
-      "$baseUrl/patients/v1/getfichePaiement/getfichePaiement/$idPatient/";
+  static String getFichePaiementNonValideUrl(String idPatient) =>
+      "$baseUrl/patients/v1/fichepaiements/get_fiche_by_patient_non_validees/$idPatient/";
+  static String getFichePaiementValideUrl(String idPatient) =>
+      "$baseUrl/patients/v1/fichepaiements/get_fiche_by_patient_validees/$idPatient/";
 
   // 1er type de POST sans utiliser de token
   Future<ResponseRequest> postApiUn(String url, Map data) async {
@@ -75,8 +68,9 @@ class Api {
         url,
         data: data,
         options: Options(
-            sendTimeout: const Duration(seconds: 2),
-            receiveTimeout: const Duration(seconds: 5),
+            sendTimeout: const Duration(seconds: 10),
+            receiveTimeout: const Duration(seconds: 10),
+            persistentConnection: false,
             followRedirects: false,
             validateStatus: (status) => true,
             //responseType: ResponseType.plain,
@@ -127,8 +121,8 @@ class Api {
         url,
         data: data,
         options: Options(
-            sendTimeout: const Duration(seconds: 2),
-            receiveTimeout: const Duration(seconds: 5),
+            sendTimeout: const Duration(seconds: 10),
+            receiveTimeout: const Duration(seconds: 10),
             followRedirects: false,
             validateStatus: (status) => true,
             //responseType: ResponseType.plain,
@@ -178,8 +172,8 @@ class Api {
       Patient patient = await Database().getInfoBoxPatient();
       Response response = await dio.get(url,
           options: Options(
-              sendTimeout: const Duration(seconds: 2),
-              receiveTimeout: const Duration(seconds: 5),
+              sendTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 10),
               followRedirects: false,
               validateStatus: (status) => true,
               //responseType: ResponseType.plain,

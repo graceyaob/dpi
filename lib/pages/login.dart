@@ -44,8 +44,8 @@ class _LoginState extends State<Login> {
                     fontSize: 30),
               ),
               Container(
-                margin: EdgeInsets.only(top: 80),
-                padding: EdgeInsets.only(top: 50, left: 50, right: 50),
+                margin: const EdgeInsets.only(top: 80),
+                padding: const EdgeInsets.only(top: 50, left: 50, right: 50),
                 height: 660,
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -169,7 +169,6 @@ class _LoginState extends State<Login> {
                                 Patient databdlocal =
                                     await Database().getInfoBoxPatient();
                                 print(databdlocal.firstLogin);
-                                getHttp();
 
                                 //si first login == true alors tu appelles l'Api du back(internet)
                                 if (databdlocal.firstLogin == true) {
@@ -201,9 +200,7 @@ class _LoginState extends State<Login> {
                                   }
                                 } else {
                                   //connection à la base de donnée local
-                                  print(databdlocal.username);
 
-                                  print(encryptAES(_passwordController.text));
                                   // verification des champs de saisis avec les données de la base de donnée
                                   if ((_isnController.text ==
                                           databdlocal.username) &&

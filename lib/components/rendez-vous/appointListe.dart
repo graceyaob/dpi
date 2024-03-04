@@ -1,6 +1,7 @@
 import 'package:dpi_mobile/components/function404.dart';
 import 'package:dpi_mobile/data/api/api.dart';
 import 'package:dpi_mobile/data/database/config.dart';
+import 'package:dpi_mobile/utils/config.dart';
 import 'package:flutter/material.dart';
 
 class AppointListeApp extends StatefulWidget {
@@ -47,7 +48,8 @@ class _AppointListeAppState extends State<AppointListeApp> {
           .getApi(Api.centreSanteByIdUrl(unRdv["centresante"]))
           .then((value) => value["libelle"]);
       String heureDebut = unRdv["heureDebut"];
-      String heureFin = unRdv["heureFin"];
+      String heureFin =
+          unRdv["heureFin"] == Null ? unRdv["heureFin"] : unRdv["heureFin"];
       var servicerecupere = unRdv["service"];
       String service = "";
 
@@ -104,7 +106,10 @@ class _AppointListeAppState extends State<AppointListeApp> {
                   }
                 },
               )
-            : ErrorFunction(message: "Aucun rendez-vous trouvé"),
+            : ErrorFunction(
+                message: "Aucun rendez-vous trouvé",
+                height: Config.heightSize * 0.43,
+              ),
       ),
     );
   }

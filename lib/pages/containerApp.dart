@@ -1,6 +1,7 @@
 import 'package:dpi_mobile/pages/carnet.dart';
 import 'package:dpi_mobile/pages/consultation.dart';
 import 'package:dpi_mobile/pages/home.dart';
+import 'package:dpi_mobile/pages/pageRecu.dart';
 import 'package:dpi_mobile/pages/profil.dart';
 import 'package:dpi_mobile/pages/rendezVous.dart';
 import 'package:dpi_mobile/utils/config.dart';

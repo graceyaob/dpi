@@ -362,6 +362,5 @@ class _ConsultationPageState extends State<ConsultationPage> {
 
 //Dans cet exemple, nous avons utilisé Form pour englober le widget de sélection et le bouton de validation. Le widget DropdownButtonFormField est utilisé pour créer le champ de sélection, et ElevatedButton est utilisé pour le bouton de validation. Lorsque l'utilisateur sélectionne une option et appuie sur le bouton "Valider", les données sont validées et traitées.
 
-//Assurez-vous d'ajouter une logique de validation appropriée si nécessaire en utilisant le paramètre validator du widget DropdownButtonFormField.
 
 

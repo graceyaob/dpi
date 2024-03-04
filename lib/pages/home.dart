@@ -61,11 +61,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    double largeur = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: largeur * 0.005,
+          horizontal: Config.widthSize * 0.005,
         ),
         child: SafeArea(
           child: Column(
@@ -77,7 +76,8 @@ class _HomePageState extends State<HomePage> {
               ),
               Padding(
                   padding: EdgeInsets.symmetric(
-                      horizontal: largeur * 0.05, vertical: largeur * 0.05),
+                      horizontal: Config.widthSize * 0.05,
+                      vertical: Config.widthSize * 0.05),
                   child: uneConsultation
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,13 +87,13 @@ class _HomePageState extends State<HomePage> {
                               "Mes dernières constantes",
                               style: TextStyle(
                                   color: const Color(0xFF655F5F),
-                                  fontSize: largeur * 0.04,
+                                  fontSize: Config.widthSize * 0.04,
                                   fontWeight: FontWeight.w500),
                             ),
                             Config.spaceMeduim,
                             Padding(
                                 padding: EdgeInsets.symmetric(
-                                    horizontal: largeur * 0.05),
+                                    horizontal: Config.widthSize * 0.05),
                                 child: Column(
                                   children: [
                                     Row(
@@ -137,10 +137,12 @@ class _HomePageState extends State<HomePage> {
                           ],
                         )
                       : ErrorFunction(
-                          message: "Aucuns parametres enregistrés")),
+                          message: "Aucuns parametres enregistrés",
+                          height: Config.heightSize * 0.4,
+                        )),
               Config.spaceSmall,
               Padding(
-                padding: EdgeInsets.only(left: largeur * 0.70),
+                padding: EdgeInsets.only(left: Config.widthSize * 0.70),
                 child: ButtonFacture(
                   fondBouton: Config.couleurPrincipale,
                   couleurEcriture: Colors.white,
