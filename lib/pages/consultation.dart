@@ -222,11 +222,13 @@ class _ConsultationPageState extends State<ConsultationPage> {
               formulaireConsultation: true,
               onValueChanged: (selectedPrestation) {
                 listPrestations.forEach((prestation) {
+                  print(prestation);
                   if (prestation["motif"]["libelle"] == selectedPrestation) {
                     setState(() {
                       idPrestation = prestation["id"];
                       idMontant = prestation["motif"]["cout"];
                       prix.text = "$idMontant fcfa";
+                      print("idprestation = $idPrestation");
                     });
                   }
                 });

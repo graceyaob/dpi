@@ -1,4 +1,6 @@
 import 'package:dpi_mobile/components/function404.dart';
+import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dpi_mobile/data/api/api.dart';
 import 'package:dpi_mobile/data/database/config.dart';
 import 'package:dpi_mobile/components/PagesCarnet/cadre.dart';
@@ -15,9 +17,30 @@ class _CarnetState extends State<Carnet> {
   String id = '';
   List consultations = [];
   bool uneConsultation = true;
+  StreamController<ConnectivityResult> connectivityStream =
+      StreamController<ConnectivityResult>();
 
   @override
   void initState() {
+    checkInternetConnection();
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      connectivityStream.add(result);
+    });
+    super.initState();
+  }
+
+  void checkInternetConnection() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        uneConsultation = true;
+      });
+    } else {
+      callApi();
+    }
+  }
+
+  void callApi() {
     Database().getInfoBoxPatient().then((value) {
       setState(
         () {
@@ -36,8 +59,6 @@ class _CarnetState extends State<Carnet> {
         });
       });
     });
-
-    super.initState();
   }
 
   //fonction pour recuperer les consultations
@@ -101,27 +122,51 @@ class _CarnetState extends State<Carnet> {
         body: SafeArea(
       child: Column(children: [
         Cadre(titre: "Ma liste de Consultations"),
-        SizedBox(
-            height: Config.heightSize * 0.5,
-            //Arevoir
-            child: uneConsultation
-                ? FutureBuilder<List<Card>>(
-                    future: buildConsultationCards(consultations),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<List<Card>> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text("Erreur: ${snapshot.error}");
-                      } else {
-                        return ListView(children: snapshot.data!);
-                      }
-                    })
-                : ErrorFunction(
-                    message: "Aucune consultation trouvé",
-                    height: Config.heightSize * 0.43,
-                  ))
+        StreamBuilder(
+          stream: connectivityStream.stream,
+          builder: (context, snapshot) {
+            //quand la connection est active
+            if (snapshot.connectionState == ConnectionState.active) {
+              var result = snapshot.data;
+              //quand la connexion se désactive
+              if (result == ConnectivityResult.none) {
+                return carnet();
+              } else {
+                callApi();
+                return carnet();
+              }
+            }
+            //quand il n'y a pas connexion
+
+            else {
+              return carnet();
+            }
+          },
+        ),
       ]),
     ));
+  }
+
+  Widget carnet() {
+    return SizedBox(
+        height: Config.heightSize * 0.5,
+        //Arevoir
+        child: uneConsultation
+            ? FutureBuilder<List<Card>>(
+                future: buildConsultationCards(consultations),
+                builder:
+                    (BuildContext context, AsyncSnapshot<List<Card>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text("Erreur: ${snapshot.error}");
+                  } else {
+                    return ListView(children: snapshot.data!);
+                  }
+                })
+            : ErrorFunction(
+                message: "Aucune consultation trouvé",
+                height: Config.heightSize * 0.43,
+              ));
   }
 }

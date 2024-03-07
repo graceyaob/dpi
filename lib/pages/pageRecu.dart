@@ -1,4 +1,6 @@
 import 'package:dpi_mobile/data/api/api.dart';
+import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dpi_mobile/data/database/config.dart';
 import 'package:dpi_mobile/utils/config.dart';
 import 'package:flutter/material.dart';
@@ -14,10 +16,30 @@ class _RecuPaiementState extends State<RecuPaiement> {
   String id = '';
   List<Map<String, dynamic>> fiches = [];
   bool unefichePaiement = true;
+  StreamController<ConnectivityResult> connectivityStream =
+      StreamController<ConnectivityResult>();
 
   @override
   void initState() {
+    checkInternetConnection();
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      connectivityStream.add(result);
+    });
     super.initState();
+  }
+
+  void checkInternetConnection() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        unefichePaiement = true;
+      });
+    } else {
+      callApi();
+    }
+  }
+
+  void callApi() {
     Database().getInfoBoxPatient().then((value) {
       setState(() {
         id = value.id;

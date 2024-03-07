@@ -22,7 +22,9 @@ class Api {
       "Veuillez vérifier votre connexion internet. Un problème de réseau est survenue.";
 //http://192.168.1.162:8000 pour le bureau
 //http://192.168.1.11:8000 pour la maison
-  static const baseUrl = 'http://192.168.1.145:8000';
+//http://192.168.1.145:8000 pour idriss
+//https://dpi-backend-develop.winlogic.pro en ligne
+  static const baseUrl = 'http://192.168.1.162:8000 ';
   static String loginUrl() => "$baseUrl/users/v1/login_patients/";
   static String centreSanteUrl(String idVille) =>
       "$baseUrl/accueils/v1/centresantes/get_centresante_by_ville/$idVille/";
@@ -95,7 +97,7 @@ class Api {
           }
         } catch (e) {
           print(e);
-          return ResponseRequest(status: 300, message: messageErreur);
+          return ResponseRequest(status: 400, message: messageErreur);
         }
       }
     } on DioException catch (e) {
@@ -103,12 +105,12 @@ class Api {
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.sendTimeout ||
           e.error is SocketException) {
-        return ResponseRequest(status: 300, message: messageInternet);
+        return ResponseRequest(status: 500, message: messageInternet);
       } else {
-        return ResponseRequest(status: 300, message: messageErreurInterne);
+        return ResponseRequest(status: 600, message: messageErreurInterne);
       }
     } catch (e) {
-      return ResponseRequest(status: 300, message: messageErreurInterne);
+      return ResponseRequest(status: 700, message: messageErreurInterne);
     }
   }
 

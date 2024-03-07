@@ -49,7 +49,7 @@ class _AppointListeAppState extends State<AppointListeApp> {
           .then((value) => value["libelle"]);
       String heureDebut = unRdv["heureDebut"];
       String heureFin =
-          unRdv["heureFin"] == Null ? unRdv["heureFin"] : unRdv["heureFin"];
+          unRdv["heureFin"] == null ? unRdv["heureDebut"] : unRdv["heureFin"];
       var servicerecupere = unRdv["service"];
       String service = "";
 

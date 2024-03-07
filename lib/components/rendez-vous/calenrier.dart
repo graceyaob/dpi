@@ -1,4 +1,6 @@
 import 'package:dpi_mobile/components/function404.dart';
+import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dpi_mobile/data/api/api.dart';
 import 'package:dpi_mobile/data/database/config.dart';
 import 'package:dpi_mobile/utils/config.dart';
@@ -16,11 +18,27 @@ class Calendrier extends StatefulWidget {
 class _CalendrierState extends State<Calendrier> {
   late List<Appointment> _appointments = [];
   bool _isLoading = true; // Variable pour suivre l'état de chargement
+  StreamController<ConnectivityResult> connectivityStream =
+      StreamController<ConnectivityResult>();
 
   @override
   void initState() {
     super.initState();
-    _loadAppointments();
+    checkInternetConnection();
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      connectivityStream.add(result);
+    });
+  }
+
+  void checkInternetConnection() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        _appointments = [];
+      });
+    } else {
+      _loadAppointments();
+    }
   }
 
   Future<void> _loadAppointments() async {
@@ -44,38 +62,61 @@ class _CalendrierState extends State<Calendrier> {
                   message: "Aucun rendez-vous trouvé",
                   height: Config.heightSize * 0.43,
                 ) // Afficher un message si la liste est vide
-              : SfCalendar(
-                  view: CalendarView.week,
-                  firstDayOfWeek: 1,
-                  dataSource: AppointSource(_appointments),
-                  // fonction pour afficher un boite a dialogue pour rendre les details des rendez vous visible
-                  onTap: (CalendarTapDetails details) {
-                    if (details.appointments != null &&
-                        details.appointments!.isNotEmpty) {
-                      // Afficher une boîte de dialogue lorsque l'utilisateur clique sur un rendez-vous
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          // Créer et retourner la boîte de dialogue
-                          return AlertDialog(
-                            title: Text("Rendez-vous"),
-                            content: Text(
-                                "Description: ${details.appointments![0].subject}"),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  // Fermer la boîte de dialogue
-                                },
-                                child: Text('Fermer'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
+              : StreamBuilder(
+                  stream: connectivityStream.stream,
+                  builder: (context, snapshot) {
+                    //quand la connection est active
+                    if (snapshot.connectionState == ConnectionState.active) {
+                      var result = snapshot.data;
+                      //quand la connexion se désactive
+                      if (result == ConnectivityResult.none) {
+                        return calendrier();
+                      } else {
+                        _loadAppointments();
+                        return calendrier();
+                      }
+                    }
+                    //quand il n'y a pas connexion
+
+                    else {
+                      return calendrier();
                     }
                   },
                 ),
+    );
+  }
+
+  Widget calendrier() {
+    return SfCalendar(
+      view: CalendarView.week,
+      firstDayOfWeek: 1,
+      dataSource: AppointSource(_appointments),
+      // fonction pour afficher un boite a dialogue pour rendre les details des rendez vous visible
+      onTap: (CalendarTapDetails details) {
+        if (details.appointments != null && details.appointments!.isNotEmpty) {
+          // Afficher une boîte de dialogue lorsque l'utilisateur clique sur un rendez-vous
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              // Créer et retourner la boîte de dialogue
+              return AlertDialog(
+                title: Text("Rendez-vous"),
+                content:
+                    Text("Description: ${details.appointments![0].subject}"),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      // Fermer la boîte de dialogue
+                    },
+                    child: Text('Fermer'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      },
     );
   }
 }

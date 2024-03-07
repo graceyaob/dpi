@@ -196,7 +196,8 @@ class _LoginState extends State<Login> {
                                       isLoading = false;
                                     });
                                     // ignore: use_build_context_synchronously
-                                    showAlertDialog(context, sortir.message!);
+                                    showAlertDialog(
+                                        context, "${sortir.status}!");
                                   }
                                 } else {
                                   //connection à la base de donnée local
